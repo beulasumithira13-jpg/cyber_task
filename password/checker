@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Password Strength Checker</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+
+        .toggle {
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 5px;
+            color: #007bff;
+        }
+
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        #strength {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        ul {
+            text-align: left;
+            font-size: 14px;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .valid { color: green; }
+        .invalid { color: red; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Password Strength Checker 🔐</h2>
+
+    <input 
+        type="password" 
+        id="password" 
+        placeholder="Enter password"
+        onkeyup="checkStrength()"
+    >
+
+    <div class="toggle" onclick="togglePassword()">👁 Show / Hide Password</div>
+
+    <div class="progress">
+        <div class="progress-bar" id="bar"></div>
+    </div>
+
+    <div id="strength"></div>
+
+    <ul>
+        <li id="len" class="invalid">At least 6 characters</li>
+        <li id="upper" class="invalid">One uppercase letter</li>
+        <li id="num" class="invalid">One number</li>
+        <li id="sym" class="invalid">One special character</li>
+    </ul>
+</div>
+
+<script>
+    const commonPasswords = ["123456", "password", "qwerty", "admin"];
+
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+
+    function checkStrength() {
+        const password = document.getElementById("password").value;
+        const strengthText = document.getElementById("strength");
+        const bar = document.getElementById("bar");
+
+        let strength = 0;
+
+        // Rules
+        password.length >= 6 ? valid("len") : invalid("len");
+        /[A-Z]/.test(password) ? valid("upper") : invalid("upper");
+        /[0-9]/.test(password) ? valid("num") : invalid("num");
+        /[^A-Za-z0-9]/.test(password) ? valid("sym") : invalid("sym");
+
+        if (password.length >= 6) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        if (password.length === 0) {
+            strengthText.innerHTML = "";
+            bar.style.width = "0%";
+            return;
+        }
+
+        if (commonPasswords.includes(password)) {
+            strengthText.innerHTML = "Common password ❌";
+            strengthText.style.color = "red";
+            bar.style.width = "20%";
+            bar.style.background = "red";
+            return;
+        }
+
+        if (strength <= 1) {
+            strengthText.innerHTML = "Weak Password ❌";
+            strengthText.style.color = "red";
+            bar.style.width = "25%";
+            bar.style.background = "red";
+        }
+        else if (strength === 2 || strength === 3) {
+            strengthText.innerHTML = "Medium Password ⚠️";
+            strengthText.style.color = "orange";
+            bar.style.width = "60%";
+            bar.style.background = "orange";
+        }
+        else {
+            strengthText.innerHTML = "Strong Password ✅";
+            strengthText.style.color = "green";
+            bar.style.width = "100%";
+            bar.style.background = "green";
+        }
+    }
+
+    function valid(id) {
+        document.getElementById(id).className = "valid";
+    }
+
+    function invalid(id) {
+        document.getElementById(id).className = "invalid";
+    }
+</script>
+
+</body>
+</html>
